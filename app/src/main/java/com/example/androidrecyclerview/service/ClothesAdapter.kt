@@ -12,29 +12,43 @@ import com.example.androidrecyclerview.model.Clothes
 class ClothesAdapter(
     private val clothes: ArrayList<Clothes>,
 ) : RecyclerView.Adapter<ClothesAdapter.ClothesViewHolder>() {
+    private var onClothesClickListener: OnClothesClickListener? = null
+
+    interface OnClothesClickListener {
+        fun onClothesClick(clothes: Clothes, position: Int)
+    }
+
     class ClothesViewHolder(
         itemView: View,
     ) : RecyclerView.ViewHolder(itemView) {
         val imageIV: ImageView = itemView.findViewById(R.id.imageIV)
         val nameTV: TextView = itemView.findViewById(R.id.nameTV)
-        val descriptionTV: TextView = itemView.findViewById(R.id.descriptionTV)
+//        val descriptionTV: TextView = itemView.findViewById(R.id.descriptionTV)
     }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): ClothesAdapter.ClothesViewHolder {
+    ): ClothesViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.recycle_list_item, parent, false)
         return ClothesViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: ClothesAdapter.ClothesViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ClothesViewHolder, position: Int) {
         val clothes = clothes[position]
         holder.imageIV.setImageResource(clothes.image)
         holder.nameTV.text = clothes.name
-        holder.descriptionTV.text = clothes.description
+//        holder.descriptionTV.text = clothes.description
+        holder.itemView.setOnClickListener {
+            if (onClothesClickListener!=null){
+                onClothesClickListener!!.onClothesClick(clothes,position)
+            }
+        }
     }
 
     override fun getItemCount(): Int = clothes.size
+    fun setOnClothesClickListner(onClothesClickListener: OnClothesClickListener) {
+        this.onClothesClickListener = onClothesClickListener
+    }
 }

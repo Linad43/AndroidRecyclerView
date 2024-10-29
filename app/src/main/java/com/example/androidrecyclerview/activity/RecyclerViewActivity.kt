@@ -1,5 +1,7 @@
 package com.example.androidrecyclerview.activity
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -53,6 +55,8 @@ class RecyclerViewActivity : AppCompatActivity() {
         Clothes(R.drawable.mens_shirt, "Men's shirt", "Рубашка мужская"),
         Clothes(R.drawable.mens_bathrobe, "Men's bathrobe", "Халат мужской")
     )
+    private lateinit var adapter: ClothesAdapter
+    private var position: Int = -1
     private lateinit var toolbar: Toolbar
     private lateinit var listViewLV: RecyclerView
 
@@ -69,7 +73,18 @@ class RecyclerViewActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         listViewLV = findViewById(R.id.listViewLV)
         listViewLV.layoutManager = LinearLayoutManager(this)
-        listViewLV.adapter = ClothesAdapter(clothes)
+        adapter = ClothesAdapter(clothes)
+        listViewLV.adapter = adapter
+        adapter.setOnClothesClickListner(object :
+            ClothesAdapter.OnClothesClickListener {
+            override fun onClothesClick(clothes: Clothes, position: Int) {
+                val intent = Intent(this@RecyclerViewActivity, DetailsActivity::class.java)
+                intent.putExtra(Clothes::class.java.simpleName, clothes)
+                intent.putExtra("position", position.toString())
+                startActivityForResult(intent, 1)
+            }
+        }
+        )
 
     }
 
@@ -85,5 +100,21 @@ class RecyclerViewActivity : AppCompatActivity() {
             }
         }
         return true
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            1 -> {
+                if (resultCode == RESULT_OK) {
+                    val clothes =
+                        data?.getSerializableExtra(Clothes::class.java.simpleName) as Clothes
+                    val position = data.getStringExtra("position")!!.toInt()
+                    this.clothes[position] = clothes
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        }
     }
 }
