@@ -5,11 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -47,23 +47,52 @@ class DetailsActivity : AppCompatActivity() {
             dialog.setView(dialogView)
             val nameET = dialogView.findViewById<EditText>(R.id.nameET)
             val descriptionET = dialogView.findViewById<EditText>(R.id.descriptionET)
+            nameET.setText(nameTV.text)
+            descriptionET.setText(descriptionTV.text)
+            val allET = arrayListOf(
+                nameET,
+                descriptionET
+            )
             dialog.setTitle("Обновить запись")
             dialog.setPositiveButton("Обновить") { _, _ ->
-                nameTV.text = nameET.text.toString()
-                descriptionTV.text = descriptionET.text.toString()
-                clothes =
-                    Clothes(clothes.image, nameET.text.toString(), descriptionET.text.toString())
-                position = intent.getStringExtra("position")!!.toInt()
-                intentBack.putExtra(Clothes::class.java.simpleName, clothes)
-                intentBack.putExtra("position", position.toString())
-                setResult(RESULT_OK, intentBack)
+                    if (allETNotEmpty(allET)) {
+                        nameTV.text = nameET.text.toString()
+                        descriptionTV.text = descriptionET.text.toString()
+                        clothes =
+                            Clothes(
+                                clothes.image,
+                                nameET.text.toString(),
+                                descriptionET.text.toString()
+                            )
+                        position = intent.getStringExtra("position")!!.toInt()
+                        intentBack.putExtra(Clothes::class.java.simpleName, clothes)
+                        intentBack.putExtra("position", position.toString())
+                        setResult(RESULT_OK, intentBack)
+                    }else{
+                        Toast.makeText(
+                            this,
+                            "Ошибка изменения",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
             }
-            dialog.setNegativeButton("Отмена"){_,_->
+            dialog.setNegativeButton("Отмена") { _, _ ->
             }
             dialog.create().show()
             false
         }
 
+    }
+
+    private fun allETNotEmpty(allET: ArrayList<EditText>): Boolean {
+        var flag = true
+        allET.forEach {
+            if (it.text.isEmpty()) {
+                it.setHint(R.string.notEmpty)
+                flag = false
+            }
+        }
+        return flag
     }
 
     private fun init() {
