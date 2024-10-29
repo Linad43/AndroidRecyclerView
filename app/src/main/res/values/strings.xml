@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AndroidRecyclerView</string>
+    <string name="next">К гардеробу</string>
+    <string name="exit">Выход</string>
+</resources>
